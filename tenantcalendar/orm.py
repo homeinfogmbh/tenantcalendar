@@ -9,6 +9,7 @@ from comcatlib import User
 from peeweeplus import JSONModel, MySQLDatabase
 
 from tenantcalendar.config import CONFIG
+from tenantcalendar.exceptions import MissingContactInfo
 
 
 __all__ = ['Event']
@@ -48,4 +49,4 @@ class Event(TenantCalendarModel):
         if self.email or self.phone:
             return super().save(*args, **kwargs)
 
-        raise ValueError('Must specify either email or phone.')
+        raise MissingContactInfo('Must specify either email or phone.')
