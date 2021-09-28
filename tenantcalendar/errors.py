@@ -2,8 +2,8 @@
 
 from wsgilib import JSONMessage
 
-from tenantforum.exceptions import MissingContactInfo
-from tenantforum.orm import Event
+from tenantcalendar.exceptions import MissingContactInfo
+from tenantcalendar.orm import Event
 
 
 __all__ = ['ERRORS']
