@@ -24,5 +24,5 @@ setup(
     maintainer_email='<r.neumann@homeinfo.de>',
     packages=['tenantcalendar'],
     license='GPLv3',
-    description='Tenant forum library.'
+    description='Tenant calendar library.'
 )
