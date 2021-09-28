@@ -3,10 +3,10 @@
 from __future__ import annotations
 from typing import Union
 
-from peewee import CharField, DateTimeField, ForeignKeyField
+from peewee import DateTimeField, ForeignKeyField
 
 from comcatlib import User
-from peeweeplus import JSONModel, MySQLDatabase
+from peeweeplus import HTMLCharField, JSONModel, MySQLDatabase
 
 from tenantcalendar.config import CONFIG
 from tenantcalendar.exceptions import MissingContactInfo
@@ -30,12 +30,12 @@ class Event(TenantCalendarModel):
     """An event entry."""
 
     user = ForeignKeyField(User, column_name='user', on_delete='CASCADE')
-    title = CharField(30)
-    email = CharField(64, null=True)
-    phone = CharField(64, null=True)
+    title = HTMLCharField(30)
+    email = HTMLCharField(64, null=True)
+    phone = HTMLCharField(64, null=True)
     start = DateTimeField()
     end = DateTimeField()
-    text = CharField(640)
+    text = HTMLCharField(640)
 
     @classmethod
     def from_json(cls, json: dict, user: Union[User, int], **kwargs) -> Event:
