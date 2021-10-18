@@ -1,6 +1,7 @@
 """Object-relational mappings."""
 
 from __future__ import annotations
+from datetime import datetime
 from typing import Union
 
 from peewee import DateTimeField, ForeignKeyField
@@ -16,6 +17,7 @@ __all__ = ['Event']
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG)
+USER_FIELDS = {'title', 'email', 'phone', 'start', 'end', 'text'}
 
 
 class TenantCalendarModel(JSONModel):   # pylint: disable=R0903
@@ -36,12 +38,20 @@ class Event(TenantCalendarModel):
     start = DateTimeField()
     end = DateTimeField()
     text = HTMLCharField(640)
+    created = DateTimeField(default=datetime.now)
+    modified = DateTimeField(null=True)
 
     @classmethod
     def from_json(cls, json: dict, user: Union[User, int], **kwargs) -> Event:
         """Creates an event from a JSON-ish dict."""
-        event = super().from_json(json, **kwargs)
+        event = super().from_json(json, only=USER_FIELDS, **kwargs)
         event.user = user
+        return event
+
+    def patch_json(self, json: dict, **kwargs) -> Event:
+        """Creates an event from a JSON-ish dict."""
+        event = super().patch_json(json, only=USER_FIELDS, **kwargs)
+        event.modified = datetime.now()
         return event
 
     def save(self, *args, **kwargs) -> int:
