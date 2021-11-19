@@ -14,7 +14,7 @@ from tenantcalendar.config import CONFIG
 from tenantcalendar.exceptions import MissingContactInfo
 
 
-__all__ = ['CustomerEvent', 'UserEvent']
+__all__ = ['CUSTOMER_FIELDS', 'USER_FIELDS', 'CustomerEvent', 'UserEvent']
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG)
@@ -52,15 +52,15 @@ class CustomerEvent(Event):
 
     @classmethod
     def from_json(cls, json: dict, customer: Union[Customer, int],
-                  **kwargs) -> Event:
+                  **kwargs) -> CustomerEvent:
         """Creates an event from a JSON-ish dict."""
-        event = super().from_json(json, only=CUSTOMER_FIELDS, **kwargs)
+        event = super().from_json(json, **kwargs)
         event.customer = customer
         return event
 
-    def patch_json(self, json: dict, **kwargs) -> Event:
+    def patch_json(self, json: dict, **kwargs) -> CustomerEvent:
         """Creates an event from a JSON-ish dict."""
-        event = super().patch_json(json, only=CUSTOMER_FIELDS, **kwargs)
+        event = super().patch_json(json, **kwargs)
         event.modified = datetime.now()
         return event
 
@@ -76,15 +76,16 @@ class UserEvent(Event):
     phone = HTMLCharField(64, null=True)
 
     @classmethod
-    def from_json(cls, json: dict, user: Union[User, int], **kwargs) -> Event:
+    def from_json(cls, json: dict, user: Union[User, int],
+                  **kwargs) -> UserEvent:
         """Creates an event from a JSON-ish dict."""
-        event = super().from_json(json, only=USER_FIELDS, **kwargs)
+        event = super().from_json(json, **kwargs)
         event.user = user
         return event
 
-    def patch_json(self, json: dict, **kwargs) -> Event:
+    def patch_json(self, json: dict, **kwargs) -> UserEvent:
         """Creates an event from a JSON-ish dict."""
-        event = super().patch_json(json, only=USER_FIELDS, **kwargs)
+        event = super().patch_json(json, **kwargs)
         event.modified = datetime.now()
         return event
 

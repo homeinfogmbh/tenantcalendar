@@ -7,9 +7,11 @@ from tenantcalendar.functions import get_customer_event
 from tenantcalendar.functions import list_user_events
 from tenantcalendar.functions import get_user_event
 from tenantcalendar.orm import CustomerEvent, UserEvent
+from tenantcalendar.wsgi import APPLICATION
 
 
 __all__ = [
+    'APPLICATION',
     'ERRORS',
     'MissingContactInfo',
     'CustomerEvent',
