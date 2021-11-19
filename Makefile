@@ -2,7 +2,7 @@ FILE_LIST = ./.installed_files.txt
 
 .PHONY: pull push clean install uninstall
 
-default: | pull clean install
+default: | pull clean generate-bindings install
 
 install:
 	@ ./setup.py install --record $(FILE_LIST)
@@ -18,3 +18,6 @@ pull:
 
 push:
 	@ git push
+
+generate-bindings:
+	@ pyxbgen -u tenantcalendar.xsd -m dom --module-prefix=tenantcalendar
