@@ -54,18 +54,6 @@ def add_customer_event() -> JSONMessage:
     return JSONMessage('Customer event added.', status=201)
 
 
-@APPLICATION.route('/user', methods=['POST'])
-@authenticated
-@authorized('tenantcalendar')
-def add_user_event() -> JSONMessage:
-    """Adds a user event."""
-
-    user_event = UserEvent.from_json(
-        request.json, CUSTOMER.id, only=USER_FIELDS)
-    user_event.save()
-    return JSONMessage('User event added.', status=201)
-
-
 @APPLICATION.route('/customer/<int:ident>', methods=['PATCH'])
 @authenticated
 @authorized('tenantcalendar')
