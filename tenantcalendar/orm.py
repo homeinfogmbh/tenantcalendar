@@ -11,6 +11,7 @@ from mdb import Customer
 from peeweeplus import HTMLCharField, JSONModel, MySQLDatabase
 
 from tenantcalendar.config import CONFIG
+from tenantcalendar.dom import Event as EventDOM
 from tenantcalendar.exceptions import MissingContactInfo
 
 
@@ -39,6 +40,17 @@ class Event(TenantCalendarModel):   # pylint: disable=R0903
     end = DateTimeField()
     created = DateTimeField(default=datetime.now)
     modified = DateTimeField(null=True)
+
+    def to_dom(self) -> EventDOM:
+        """Returns an XML DOM."""
+        event = EventDOM()
+        event.title = self.title
+        event.text = self.text
+        event.start = self.start
+        event.end = self.end
+        event.created = self.created
+        event.modified = self.modified
+        return event
 
 
 class CustomerEvent(Event):
