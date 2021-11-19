@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  XSD für Mieterkalender.
+
+  Maintainer: Richard Neumann <r dot neumann at homeinfo fullstop de>
+-->
+
+<xs:schema  xmlns="http://xml.homeinfo.de/schema/tenantcalendar"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema" version="1.0"
+            targetNamespace="http://xml.homeinfo.de/schema/tenantcalendar">
+
+    <xs:element name="events" type="Events">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">
+                Wurzelelement.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+
+    <xs:complexType name="Events">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">
+                Kunden-Events.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="event" type="Event" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">
+                        Die einzelnen Kunden-Events.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+
+    <xs:complexType name="Event">
+        <xs:annotation>
+            <xs:documentation xml:lang="de">
+                Abfuhrstelle.
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="title" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">
+                        Titel des Events.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="text" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">
+                        Fließtext des Events.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="start" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">
+                        Beginn des Events.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="end" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:documentation xml:lang="de">
+                        Ende des Events.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="created" type="xs:dateTime">
+            <xs:annotation>
+                <xs:documentation xml:lang="de">
+                    Erstellungsdatum des Events.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="modified" type="xs:dateTime">
+            <xs:annotation>
+                <xs:documentation xml:lang="de">
+                    Letzte Änderung des Events.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+</xs:schema>
