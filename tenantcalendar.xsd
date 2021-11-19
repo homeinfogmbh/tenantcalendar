@@ -73,6 +73,13 @@
                 </xs:annotation>
             </xs:element>
         </xs:sequence>
+        <xs:attribute name="id" type="xs:nonNegativeInteger">
+            <xs:annotation>
+                <xs:documentation xml:lang="de">
+                    Datenbank-ID des Events.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
         <xs:attribute name="created" type="xs:dateTime">
             <xs:annotation>
                 <xs:documentation xml:lang="de">

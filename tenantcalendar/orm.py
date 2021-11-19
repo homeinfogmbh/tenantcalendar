@@ -44,6 +44,7 @@ class Event(TenantCalendarModel):   # pylint: disable=R0903
     def to_dom(self) -> EventDOM:
         """Returns an XML DOM."""
         event = EventDOM()
+        event.id = self.id
         event.title = self.title
         event.text = self.text
         event.start = self.start
