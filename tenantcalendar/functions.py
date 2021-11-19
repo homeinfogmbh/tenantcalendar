@@ -6,30 +6,54 @@ from typing import Optional
 from peewee import ModelSelect
 
 from comcatlib import User
-from mdb import Customer, Tenement
+from mdb import Company, Customer, Tenement
 
-from tenantcalendar.orm import Event
-
-
-__all__ = ['list_events', 'get_event']
+from tenantcalendar.orm import CustomerEvent, UserEvent
 
 
-def list_events(customer: Customer, *, start: Optional[datetime] = None,
-                end: Optional[datetime] = None) -> ModelSelect:
-    """Lists events of a customer."""
+__all__ = ['list_user_events', 'get_user_event']
+
+
+def list_customer_events(customer: Customer, *,
+                         start: Optional[datetime] = None,
+                         end: Optional[datetime] = None) -> ModelSelect:
+    """Lists user events."""
+
+    condition = CustomerEvent.customer == customer
+
+    if start is not None:
+        condition &= CustomerEvent.start >= start
+
+    if end is not None:
+        condition &= CustomerEvent.end < end
+
+    return CustomerEvent.select().join(Customer).join(Company).where(condition)
+
+
+def get_customer_event(ident: int, customer: Customer) -> CustomerEvent:
+    """Returns the given event of a customer."""
+
+    return list_customer_events(customer).where(
+        CustomerEvent.id == ident).get()
+
+
+def list_user_events(customer: Customer, *,
+                     start: Optional[datetime] = None,
+                     end: Optional[datetime] = None) -> ModelSelect:
+    """Lists user events."""
 
     condition = Tenement.customer == customer
 
     if start is not None:
-        condition &= Event.start >= start
+        condition &= UserEvent.start >= start
 
     if end is not None:
-        condition &= Event.end < end
+        condition &= UserEvent.end < end
 
-    return Event.select().join(User).join(Tenement).where(condition)
+    return UserEvent.select().join(User).join(Tenement).where(condition)
 
 
-def get_event(ident: int, customer: Customer) -> Event:
+def get_user_event(ident: int, customer: Customer) -> UserEvent:
     """Returns the given event of a customer."""
 
-    return list_events(customer).where(Event.id == ident).get()
+    return list_user_events(customer).where(UserEvent.id == ident).get()
