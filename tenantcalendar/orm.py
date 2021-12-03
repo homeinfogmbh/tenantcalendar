@@ -8,9 +8,8 @@ from peewee import DateTimeField, ForeignKeyField
 
 from comcatlib import User
 from mdb import Customer
-from peeweeplus import HTMLCharField, JSONModel, MySQLDatabase
+from peeweeplus import HTMLCharField, JSONModel, MySQLDatabaseProxy
 
-from tenantcalendar.config import CONFIG
 from tenantcalendar.dom import Event as EventDOM
 from tenantcalendar.exceptions import MissingContactInfo
 
@@ -18,7 +17,7 @@ from tenantcalendar.exceptions import MissingContactInfo
 __all__ = ['CUSTOMER_FIELDS', 'USER_FIELDS', 'CustomerEvent', 'UserEvent']
 
 
-DATABASE = MySQLDatabase.from_config(CONFIG)
+DATABASE = MySQLDatabaseProxy('tenantcalendar')
 CUSTOMER_FIELDS = {'title', 'start', 'end', 'text'}
 USER_FIELDS = {'title', 'email', 'phone', 'start', 'end', 'text'}
 
