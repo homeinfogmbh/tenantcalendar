@@ -40,7 +40,7 @@
     <xs:complexType name="Event">
         <xs:annotation>
             <xs:documentation xml:lang="de">
-                Abfuhrstelle.
+                Ein Event.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>
