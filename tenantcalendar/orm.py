@@ -97,9 +97,9 @@ class UserEvent(Event):
 
     def patch_json(self, json: dict, **kwargs) -> UserEvent:
         """Creates an event from a JSON-ish dict."""
-        event = super().patch_json(json, **kwargs)
-        event.modified = datetime.now()
-        return event
+        super().patch_json(json, **kwargs)
+        self.modified = datetime.now()
+        return self
 
     def save(self, *args, **kwargs) -> int:
         """Saves the record."""
