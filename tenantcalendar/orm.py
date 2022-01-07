@@ -40,6 +40,12 @@ class Event(TenantCalendarModel):   # pylint: disable=R0903
     created = DateTimeField(default=datetime.now)
     modified = DateTimeField(null=True)
 
+    def patch_json(self, json: dict, **kwargs) -> Event:
+        """Creates an event from a JSON-ish dict."""
+        super().patch_json(json, **kwargs)
+        self.modified = datetime.now()
+        return self
+
     def to_dom(self) -> EventDOM:
         """Returns an XML DOM."""
         event = EventDOM()
@@ -70,12 +76,6 @@ class CustomerEvent(Event):
         event.customer = customer
         return event
 
-    def patch_json(self, json: dict, **kwargs) -> CustomerEvent:
-        """Creates an event from a JSON-ish dict."""
-        super().patch_json(json, **kwargs)
-        self.modified = datetime.now()
-        return self
-
 
 class UserEvent(Event):
     """A user-defined event."""
@@ -94,12 +94,6 @@ class UserEvent(Event):
         event = super().from_json(json, **kwargs)
         event.user = user
         return event
-
-    def patch_json(self, json: dict, **kwargs) -> UserEvent:
-        """Creates an event from a JSON-ish dict."""
-        super().patch_json(json, **kwargs)
-        self.modified = datetime.now()
-        return self
 
     def save(self, *args, **kwargs) -> int:
         """Saves the record."""
