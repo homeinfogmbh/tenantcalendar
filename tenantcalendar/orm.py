@@ -72,9 +72,9 @@ class CustomerEvent(Event):
 
     def patch_json(self, json: dict, **kwargs) -> CustomerEvent:
         """Creates an event from a JSON-ish dict."""
-        event = super().patch_json(json, **kwargs)
-        event.modified = datetime.now()
-        return event
+        super().patch_json(json, **kwargs)
+        self.modified = datetime.now()
+        return self
 
 
 class UserEvent(Event):
