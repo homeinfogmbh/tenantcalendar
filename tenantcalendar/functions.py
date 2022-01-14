@@ -1,14 +1,20 @@
 """Common functions."""
 
 from datetime import datetime
-from typing import Optional
+from typing import Iterable, Optional, Union
 
-from peewee import ModelSelect
+from peewee import Select
 
+from cmslib import Group, Groups
 from comcatlib import User
+from hwdb import Deployment
 from mdb import Company, Customer, Tenement
 
-from tenantcalendar.orm import CustomerEvent, UserEvent
+from tenantcalendar.orm import CustomerEvent
+from tenantcalendar.orm import DeploymentCustomerEvent
+from tenantcalendar.orm import GroupCustomerEvent
+from tenantcalendar.orm import UserCustomerEvent
+from tenantcalendar.orm import UserEvent
 
 
 __all__ = [
@@ -17,7 +23,8 @@ __all__ = [
     'list_user_events',
     'get_user_event',
     'list_own_events',
-    'get_own_event'
+    'get_own_event',
+    'get_events_for'
 ]
 
 
@@ -25,7 +32,7 @@ def list_customer_events(
         customer: Customer, *,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None
-) -> ModelSelect:
+) -> Select:
     """Lists user events."""
 
     condition = CustomerEvent.customer == customer
@@ -50,7 +57,7 @@ def list_user_events(
         customer: Customer, *,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None
-) -> ModelSelect:
+) -> Select:
     """Lists user events."""
 
     condition = Tenement.customer == customer
@@ -74,7 +81,7 @@ def list_own_events(
         user: User, *,
         start: Optional[datetime] = None,
         end: Optional[datetime] = None
-) -> ModelSelect:
+) -> Select:
     """Lists user events."""
 
     condition = UserEvent.user == user
@@ -92,3 +99,50 @@ def get_own_event(ident: int, user: User) -> UserEvent:
     """Returns the given event of a particular user."""
 
     return list_own_events(user).where(UserEvent.id == ident).get()
+
+
+def get_events_for_groups(groups: Iterable[Group]) -> Select:
+    """Select events for the given groups."""
+
+    return CustomerEvent.select().join(GroupCustomerEvent).where(
+        GroupCustomerEvent.group << groups
+    )
+
+
+def get_events_for_group(group: Group) -> Select:
+    """Select customer events for the given group."""
+
+    return get_events_for_groups(
+        Groups.for_customer(group.customer).lineage(group)
+    )
+
+
+def get_events_for_user(user: User) -> Select:
+    """Select customer events for the given user."""
+
+    return CustomerEvent.select().join(UserCustomerEvent).where(
+        UserCustomerEvent.user == user
+    )
+
+
+def get_events_for_deployment(deployment: Deployment) -> Select:
+    """Select customer events for the given deployment."""
+
+    return CustomerEvent.select().join(DeploymentCustomerEvent).where(
+        DeploymentCustomerEvent.deployment == deployment
+    )
+
+
+def get_events_for(target: Union[Group, User, Deployment]) -> Select:
+    """Selects events for the given target."""
+
+    if isinstance(target, Group):
+        return get_events_for_group(target)
+
+    if isinstance(target, User):
+        return get_events_for_user(target)
+
+    if isinstance(target, Deployment):
+        return get_events_for_deployment(target)
+
+    raise TypeError(f'Cannot select events for invalid type {type(target)}')

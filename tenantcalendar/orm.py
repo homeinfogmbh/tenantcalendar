@@ -16,7 +16,15 @@ from tenantcalendar.dom import Event as EventDOM
 from tenantcalendar.exceptions import MissingContactInfo
 
 
-__all__ = ['CUSTOMER_FIELDS', 'USER_FIELDS', 'CustomerEvent', 'UserEvent']
+__all__ = [
+    'CUSTOMER_FIELDS',
+    'USER_FIELDS',
+    'CustomerEvent',
+    'DeploymentCustomerEvent',
+    'GroupCustomerEvent',
+    'UserCustomerEvent',
+    'UserEvent'
+]
 
 
 DATABASE = MySQLDatabaseProxy('tenantcalendar')
