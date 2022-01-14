@@ -5,8 +5,8 @@ from typing import Iterable, Iterator, Optional, Union
 
 from peewee import Select
 
-from cmslib import Group, Groups, get_groups_of as get_groups_of_user
-from comcatlib import User, get_groups_of as get_groups_of_deployment
+from cmslib import Group, Groups, get_groups_lineage as ggl_user
+from comcatlib import User, get_groups_lineage as ggl_deployment
 from hwdb import Deployment
 from mdb import Company, Customer, Tenement
 
@@ -105,20 +105,8 @@ def get_events_for_groups(groups: Iterable[Group]) -> Select:
     """Select events for the given groups."""
 
     return CustomerEvent.select().join(GroupCustomerEvent).where(
-        GroupCustomerEvent.group << groups
+        GroupCustomerEvent.group << set(groups)
     )
-
-
-def get_events_for_group(
-        group: Group, *,
-        groups: Optional[Groups] = None
-) -> Select:
-    """Select customer events for the given group."""
-
-    if groups is None:
-        groups = Groups.for_customer(group.customer)
-
-    return get_events_for_groups(groups.lineage(group))
 
 
 def _get_events_for_user(user: User) -> Select:
@@ -133,10 +121,7 @@ def get_events_for_user(user: User) -> Iterator[CustomerEvent]:
     """Yields events for the respective user."""
 
     yield from _get_events_for_user(user)
-    groups = Groups.for_customer(user.tenement.customer)
-
-    for group in groups.groups(get_groups_of_user(user)):
-        yield from get_events_for_group(group, groups=groups)
+    yield from get_events_for_groups(ggl_user(user))
 
 
 def _get_events_for_deployment(deployment: Deployment) -> Select:
@@ -157,10 +142,7 @@ def get_events_for_deployment(
     """
 
     yield from _get_events_for_deployment(deployment)
-    groups = Groups.for_customer(deployment.customer)
-
-    for group in groups.groups(get_groups_of_deployment(deployment)):
-        yield from get_events_for_group(group, groups=groups)
+    yield from get_events_for_groups(ggl_deployment(deployment))
 
 
 def get_events_for(
