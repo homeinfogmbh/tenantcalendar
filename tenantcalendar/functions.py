@@ -101,11 +101,19 @@ def get_own_event(ident: int, user: User) -> UserEvent:
     return list_own_events(user).where(UserEvent.id == ident).get()
 
 
-def get_events_for_groups(groups: Iterable[Group]) -> Select:
+def _get_events_for_groups(groups: Iterable[Group]) -> Select:
     """Select events for the given groups."""
 
     return CustomerEvent.select().join(GroupCustomerEvent).where(
         GroupCustomerEvent.group << set(groups)
+    )
+
+
+def get_events_for_group(group: Group) -> Iterator[CustomerEvent]:
+    """Yield events for the given group."""
+
+    yield from _get_events_for_groups(
+        Groups.for_customer(group.customer).lineage(group)
     )
 
 
@@ -121,7 +129,7 @@ def get_events_for_user(user: User) -> Iterator[CustomerEvent]:
     """Yields events for the respective user."""
 
     yield from _get_events_for_user(user)
-    yield from get_events_for_groups(ggl_user(user))
+    yield from _get_events_for_groups(ggl_user(user))
 
 
 def _get_events_for_deployment(deployment: Deployment) -> Select:
@@ -142,7 +150,7 @@ def get_events_for_deployment(
     """
 
     yield from _get_events_for_deployment(deployment)
-    yield from get_events_for_groups(ggl_deployment(deployment))
+    yield from _get_events_for_groups(ggl_deployment(deployment))
 
 
 def get_events_for(
