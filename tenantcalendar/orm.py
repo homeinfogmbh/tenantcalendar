@@ -12,7 +12,6 @@ from hwdb import Deployment
 from mdb import Customer
 from peeweeplus import HTMLCharField, JSONModel, MySQLDatabaseProxy
 
-from tenantcalendar.dom import Event as EventDOM
 from tenantcalendar.exceptions import MissingContactInfo
 
 
@@ -55,18 +54,6 @@ class Event(TenantCalendarModel):   # pylint: disable=R0903
         super().patch_json(json, **kwargs)
         self.modified = datetime.now()
         return self
-
-    def to_dom(self) -> EventDOM:
-        """Returns an XML DOM."""
-        event = EventDOM()
-        event.id = self.id
-        event.title = self.title
-        event.text = self.text
-        event.start = self.start
-        event.end = self.end
-        event.created = self.created
-        event.modified = self.modified
-        return event
 
 
 class CustomerEvent(Event):
