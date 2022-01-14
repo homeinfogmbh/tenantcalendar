@@ -21,9 +21,11 @@ __all__ = [
 ]
 
 
-def list_customer_events(customer: Customer, *,
-                         start: Optional[datetime] = None,
-                         end: Optional[datetime] = None) -> ModelSelect:
+def list_customer_events(
+        customer: Customer, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> ModelSelect:
     """Lists user events."""
 
     condition = CustomerEvent.customer == customer
@@ -44,9 +46,11 @@ def get_customer_event(ident: int, customer: Customer) -> CustomerEvent:
         CustomerEvent.id == ident).get()
 
 
-def list_user_events(customer: Customer, *,
-                     start: Optional[datetime] = None,
-                     end: Optional[datetime] = None) -> ModelSelect:
+def list_user_events(
+        customer: Customer, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> ModelSelect:
     """Lists user events."""
 
     condition = Tenement.customer == customer
@@ -66,8 +70,11 @@ def get_user_event(ident: int, customer: Customer) -> UserEvent:
     return list_user_events(customer).where(UserEvent.id == ident).get()
 
 
-def list_own_events(user: User, *, start: Optional[datetime] = None,
-                    end: Optional[datetime] = None) -> ModelSelect:
+def list_own_events(
+        user: User, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> ModelSelect:
     """Lists user events."""
 
     condition = UserEvent.user == user
