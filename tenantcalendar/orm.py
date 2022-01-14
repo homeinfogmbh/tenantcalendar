@@ -6,7 +6,9 @@ from typing import Union
 
 from peewee import DateTimeField, ForeignKeyField
 
+from cmslib import Group
 from comcatlib import User
+from hwdb import Deployment
 from mdb import Customer
 from peeweeplus import HTMLCharField, JSONModel, MySQLDatabaseProxy
 
@@ -75,6 +77,52 @@ class CustomerEvent(Event):
         event = super().from_json(json, **kwargs)
         event.customer = customer
         return event
+
+
+class GroupCustomerEvent(TenantCalendarModel):
+    """Mapping table for groups and customer events."""
+
+    class Meta:
+        table_name = 'group_customer_event'
+
+    ForeignKeyField(
+        Group, column_name='group', backref='events', on_delete='CASCADE'
+    )
+    ForeignKeyField(
+        CustomerEvent, column_name='event', backref='groups',
+        on_delete='CASCADE'
+    )
+
+
+class UserCustomerEvent(TenantCalendarModel):
+    """Mapping table for groups and customer events."""
+
+    class Meta:
+        table_name = 'user_customer_event'
+
+    ForeignKeyField(
+        User, column_name='user', backref='events', on_delete='CASCADE'
+    )
+    ForeignKeyField(
+        CustomerEvent, column_name='event', backref='groups',
+        on_delete='CASCADE'
+    )
+
+
+class DeploymentCustomerEvent(TenantCalendarModel):
+    """Mapping table for deployments and customer events."""
+
+    class Meta:
+        table_name = 'deployment_customer_event'
+
+    ForeignKeyField(
+        Deployment, column_name='deployment', backref='events',
+        on_delete='CASCADE'
+    )
+    ForeignKeyField(
+        CustomerEvent, column_name='event', backref='groups',
+        on_delete='CASCADE'
+    )
 
 
 class UserEvent(Event):
