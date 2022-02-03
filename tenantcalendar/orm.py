@@ -80,10 +80,10 @@ class GroupCustomerEvent(TenantCalendarModel):
     class Meta:
         table_name = 'group_customer_event'
 
-    ForeignKeyField(
+    group = ForeignKeyField(
         Group, column_name='group', backref='events', on_delete='CASCADE'
     )
-    ForeignKeyField(
+    event = ForeignKeyField(
         CustomerEvent, column_name='event', backref='groups',
         on_delete='CASCADE'
     )
@@ -95,10 +95,10 @@ class UserCustomerEvent(TenantCalendarModel):
     class Meta:
         table_name = 'user_customer_event'
 
-    ForeignKeyField(
+    user = ForeignKeyField(
         User, column_name='user', backref='events', on_delete='CASCADE'
     )
-    ForeignKeyField(
+    event = ForeignKeyField(
         CustomerEvent, column_name='event', backref='groups',
         on_delete='CASCADE'
     )
@@ -110,11 +110,11 @@ class DeploymentCustomerEvent(TenantCalendarModel):
     class Meta:
         table_name = 'deployment_customer_event'
 
-    ForeignKeyField(
+    deployment = ForeignKeyField(
         Deployment, column_name='deployment', backref='events',
         on_delete='CASCADE'
     )
-    ForeignKeyField(
+    event = ForeignKeyField(
         CustomerEvent, column_name='event', backref='groups',
         on_delete='CASCADE'
     )
