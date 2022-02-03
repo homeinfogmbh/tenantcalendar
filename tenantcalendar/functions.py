@@ -31,7 +31,10 @@ __all__ = [
     'add_to_user',
     'remove_from_user',
     'add_to_deployment',
-    'remove_from_deployment'
+    'remove_from_deployment',
+    'get_deployment_customer_events',
+    'get_group_customer_events',
+    'get_user_customer_events'
 ]
 
 
@@ -321,3 +324,27 @@ def remove_from_deployment(
 
     dce.delete_instance()
     return True
+
+
+def get_deployment_customer_events(customer: Union[Customer, int]) -> Select:
+    """Select deployment customer event mappings."""
+
+    return DeploymentCustomerEvent.select().join(Deployment).where(
+        Deployment.customer == customer
+    )
+
+
+def get_group_customer_events(customer: Union[Customer, int]) -> Select:
+    """Select group customer event mappings."""
+
+    return GroupCustomerEvent.select().join(Group).where(
+        Group.customer == customer
+    )
+
+
+def get_user_customer_events(customer: Union[Customer, int]) -> Select:
+    """Select user customer event mappings."""
+
+    return UserCustomerEvent.select().join(User).join(Tenement).where(
+        Tenement.customer == customer
+    )
