@@ -15,9 +15,6 @@ from tenantcalendar.functions import get_user_event
 from tenantcalendar.functions import list_customer_events
 from tenantcalendar.functions import list_user_events
 from tenantcalendar.functions import list_own_events
-from tenantcalendar.functions import remove_from_deployment
-from tenantcalendar.functions import remove_from_group
-from tenantcalendar.functions import remove_from_user
 from tenantcalendar.orm import CustomerEvent
 from tenantcalendar.orm import DeploymentCustomerEvent
 from tenantcalendar.orm import GroupCustomerEvent
@@ -45,8 +42,5 @@ __all__ = [
     'get_user_event',
     'list_customer_events',
     'list_user_events',
-    'list_own_events',
-    'remove_from_deployment',
-    'remove_from_group',
-    'remove_from_user'
+    'list_own_events'
 ]

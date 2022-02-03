@@ -27,11 +27,8 @@ __all__ = [
     'get_own_event',
     'get_events_for',
     'add_to_group',
-    'remove_from_group',
     'add_to_user',
-    'remove_from_user',
     'add_to_deployment',
-    'remove_from_deployment',
     'get_deployment_customer_events',
     'get_group_customer_events',
     'get_user_customer_events'
@@ -247,21 +244,6 @@ def add_to_group(event: CustomerEvent, group: Group) -> GroupCustomerEvent:
         return gce
 
 
-def remove_from_group(event: CustomerEvent, group: Group) -> bool:
-    """Remove an event from a group."""
-
-    try:
-        gce = GroupCustomerEvent.get(
-            (GroupCustomerEvent.event == event )
-            & (GroupCustomerEvent.group == group)
-        )
-    except GroupCustomerEvent.DoesNotExist:
-        return False
-
-    gce.delete_instance()
-    return True
-
-
 def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
     """Add an event to a user."""
 
@@ -274,21 +256,6 @@ def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
         uce = UserCustomerEvent(event=event, user=user)
         uce.save()
         return uce
-
-
-def remove_from_user(event: CustomerEvent, user: User) -> bool:
-    """Remove an event from a user."""
-
-    try:
-        uce = UserCustomerEvent.get(
-            (UserCustomerEvent.event == event)
-            & (UserCustomerEvent.user == user)
-        )
-    except UserCustomerEvent.DoesNotExist:
-        return False
-
-    uce.delete_instance()
-    return True
 
 
 def add_to_deployment(
@@ -306,24 +273,6 @@ def add_to_deployment(
         dce = DeploymentCustomerEvent(event=event, deployment=deployment)
         dce.save()
         return dce
-
-
-def remove_from_deployment(
-        event: CustomerEvent,
-        deployment: Deployment
-) -> bool:
-    """Remove an event from a deployment."""
-
-    try:
-        dce = DeploymentCustomerEvent.get(
-            (DeploymentCustomerEvent.event == event)
-            (DeploymentCustomerEvent.deployment == deployment)
-        )
-    except DeploymentCustomerEvent.DoesNotExist:
-        return False
-
-    dce.delete_instance()
-    return True
 
 
 def get_deployment_customer_events(customer: Union[Customer, int]) -> Select:
