@@ -25,7 +25,13 @@ __all__ = [
     'get_user_event',
     'list_own_events',
     'get_own_event',
-    'get_events_for'
+    'get_events_for',
+    'add_to_group',
+    'remove_from_group',
+    'add_to_user',
+    'remove_from_user',
+    'add_to_deployment',
+    'remove_from_deployment'
 ]
 
 
@@ -222,3 +228,96 @@ def get_events_for(
         return get_events_for_deployment(target, start=start, end=end)
 
     raise TypeError(f'Cannot select events for invalid type {type(target)}')
+
+
+def add_to_group(event: CustomerEvent, group: Group) -> GroupCustomerEvent:
+    """Add an event to a group."""
+
+    try:
+        return GroupCustomerEvent.get(
+            (GroupCustomerEvent.event == event )
+            & (GroupCustomerEvent.group == group)
+        )
+    except GroupCustomerEvent.DoesNotExist:
+        gce = GroupCustomerEvent(event=event, group=group)
+        gce.save()
+        return gce
+
+
+def remove_from_group(event: CustomerEvent, group: Group) -> bool:
+    """Remove an event from a group."""
+
+    try:
+        gce = GroupCustomerEvent.get(
+            (GroupCustomerEvent.event == event )
+            & (GroupCustomerEvent.group == group)
+        )
+    except GroupCustomerEvent.DoesNotExist:
+        return False
+
+    gce.delete_instance()
+    return True
+
+
+def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
+    """Add an event to a user."""
+
+    try:
+        return UserCustomerEvent.get(
+            (UserCustomerEvent.event == event)
+            & (UserCustomerEvent.user == user)
+        )
+    except UserCustomerEvent.DoesNotExist:
+        uce = UserCustomerEvent(event=event, user=user)
+        uce.save()
+        return uce
+
+
+def remove_from_user(event: CustomerEvent, user: User) -> bool:
+    """Remove an event from a user."""
+
+    try:
+        uce = UserCustomerEvent.get(
+            (UserCustomerEvent.event == event)
+            & (UserCustomerEvent.user == user)
+        )
+    except UserCustomerEvent.DoesNotExist:
+        return False
+
+    uce.delete_instance()
+    return True
+
+
+def add_to_deployment(
+        event: CustomerEvent,
+        deployment: Deployment
+) -> DeploymentCustomerEvent:
+    """Add an event to a deployment."""
+
+    try:
+        return DeploymentCustomerEvent.get(
+            (DeploymentCustomerEvent.event == event)
+            & (DeploymentCustomerEvent.deployment == deployment)
+        )
+    except DeploymentCustomerEvent.DoesNotExist:
+        dce = DeploymentCustomerEvent(event=event, deployment=deployment)
+        dce.save()
+        return dce
+
+
+def remove_from_deployment(
+        event: CustomerEvent,
+        deployment: Deployment
+) -> bool:
+    """Remove an event from a deployment."""
+
+    try:
+        dce = DeploymentCustomerEvent.get(
+            (DeploymentCustomerEvent.event == event)
+            (DeploymentCustomerEvent.deployment == deployment)
+        )
+    except DeploymentCustomerEvent.DoesNotExist:
+        return False
+
+    dce.delete_instance()
+    return True
