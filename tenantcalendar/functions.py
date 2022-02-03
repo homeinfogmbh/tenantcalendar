@@ -29,8 +29,11 @@ __all__ = [
     'add_to_group',
     'add_to_user',
     'add_to_deployment',
+    'get_deployment_customer_event',
     'get_deployment_customer_events',
+    'get_group_customer_event',
     'get_group_customer_events',
+    'get_user_customer_event',
     'get_user_customer_events'
 ]
 
@@ -235,7 +238,7 @@ def add_to_group(event: CustomerEvent, group: Group) -> GroupCustomerEvent:
 
     try:
         return GroupCustomerEvent.get(
-            (GroupCustomerEvent.event == event )
+            (GroupCustomerEvent.event == event)
             & (GroupCustomerEvent.group == group)
         )
     except GroupCustomerEvent.DoesNotExist:
@@ -275,6 +278,17 @@ def add_to_deployment(
         return dce
 
 
+def get_deployment_customer_event(
+        ident: int,
+        customer: Union[Customer, int]
+) -> DeploymentCustomerEvent:
+    """Select deployment customer event mappings."""
+
+    return get_deployment_customer_events(customer).where(
+        DeploymentCustomerEvent.id == ident
+    ).get()
+
+
 def get_deployment_customer_events(customer: Union[Customer, int]) -> Select:
     """Select deployment customer event mappings."""
 
@@ -283,12 +297,34 @@ def get_deployment_customer_events(customer: Union[Customer, int]) -> Select:
     )
 
 
+def get_group_customer_event(
+        ident: int,
+        customer: Union[Customer, int]
+) -> GroupCustomerEvent:
+    """Select group customer event mappings."""
+
+    return get_group_customer_events(customer).where(
+        GroupCustomerEvent.id == ident
+    ).get()
+
+
 def get_group_customer_events(customer: Union[Customer, int]) -> Select:
     """Select group customer event mappings."""
 
     return GroupCustomerEvent.select().join(Group).where(
         Group.customer == customer
     )
+
+
+def get_user_customer_event(
+        ident: int,
+        customer: Union[Customer, int]
+) -> UserCustomerEvent:
+    """Select user customer event mappings."""
+
+    return get_user_customer_events(customer).where(
+        UserCustomerEvent.id == ident
+    ).get()
 
 
 def get_user_customer_events(customer: Union[Customer, int]) -> Select:
