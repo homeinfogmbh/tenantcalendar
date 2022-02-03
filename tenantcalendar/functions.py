@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Iterable, Iterator, Optional, Union
 
-from peewee import Select
+from peewee import Expression, Select
 from werkzeug.local import LocalProxy
 
 from cmslib import Group, Groups, get_groups_lineage as ggl_user
@@ -104,20 +104,13 @@ def get_own_event(ident: int, user: User) -> UserEvent:
 
 def _get_events_for_groups(
         groups: Iterable[Group], *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+        condition: Union[bool, Expression] = True
 ) -> Select:
     """Select events for the given groups."""
 
-    condition = GroupCustomerEvent.group << set(groups)
-
-    if start is not None:
-        condition &= CustomerEvent.start >= start
-
-    if end is not None:
-        condition &= CustomerEvent.end <= end
-
-    return CustomerEvent.select().join(GroupCustomerEvent).where(condition)
+    return CustomerEvent.select().join(GroupCustomerEvent).where(
+        condition & (GroupCustomerEvent.group << set(groups))
+    )
 
 
 def get_events_for_group(
@@ -127,21 +120,7 @@ def get_events_for_group(
 ) -> Iterator[CustomerEvent]:
     """Yield events for the given group."""
 
-    yield from _get_events_for_groups(
-        Groups.for_customer(group.customer).lineage(group),
-        start=start,
-        end=end
-    )
-
-
-def _get_events_for_user(
-        user: User, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
-) -> Select:
-    """Select customer events for the given user."""
-
-    condition = UserCustomerEvent.user == user
+    condition = True
 
     if start is not None:
         condition &= CustomerEvent.start >= start
@@ -149,7 +128,21 @@ def _get_events_for_user(
     if end is not None:
         condition &= CustomerEvent.end <= end
 
-    return CustomerEvent.select().join(UserCustomerEvent).where(condition)
+    yield from _get_events_for_groups(
+        Groups.for_customer(group.customer).lineage(group),
+        condition=condition
+    )
+
+
+def _get_events_for_user(
+        user: User, *,
+        condition: Union[bool, Expression] = True
+) -> Select:
+    """Select customer events for the given user."""
+
+    return CustomerEvent.select().join(UserCustomerEvent).where(
+        condition & (UserCustomerEvent.user == user)
+    )
 
 
 def get_events_for_user(
@@ -159,20 +152,7 @@ def get_events_for_user(
 ) -> Iterator[CustomerEvent]:
     """Yields events for the respective user."""
 
-    yield from _get_events_for_user(user, start=start, end=end)
-    yield from _get_events_for_groups(ggl_user(user), start=start, end=end)
-
-
-def _get_events_for_deployment(
-        deployment: Deployment, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
-) -> Select:
-    """Select customer events for the given deployment
-    and all groups it is contained in.
-    """
-
-    condition = DeploymentCustomerEvent.deployment == deployment
+    condition = True
 
     if start is not None:
         condition &= CustomerEvent.start >= start
@@ -180,8 +160,20 @@ def _get_events_for_deployment(
     if end is not None:
         condition &= CustomerEvent.end <= end
 
+    yield from _get_events_for_user(user, condition=condition)
+    yield from _get_events_for_groups(ggl_user(user), condition=condition)
+
+
+def _get_events_for_deployment(
+        deployment: Deployment, *,
+        condition: Union[bool, Expression] = True
+) -> Select:
+    """Select customer events for the given deployment
+    and all groups it is contained in.
+    """
+
     return CustomerEvent.select().join(DeploymentCustomerEvent).where(
-        condition
+        condition & (DeploymentCustomerEvent.deployment == deployment)
     )
 
 
@@ -194,9 +186,17 @@ def get_events_for_deployment(
     and all groups it is contained in.
     """
 
-    yield from _get_events_for_deployment(deployment, start=start, end=end)
+    condition = True
+
+    if start is not None:
+        condition &= CustomerEvent.start >= start
+
+    if end is not None:
+        condition &= CustomerEvent.end <= end
+
+    yield from _get_events_for_deployment(deployment, condition=condition)
     yield from _get_events_for_groups(
-        ggl_deployment(deployment), start=start, end=end
+        ggl_deployment(deployment), condition=condition
     )
 
 
