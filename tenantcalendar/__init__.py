@@ -15,13 +15,20 @@ from tenantcalendar.functions import list_own_events
 from tenantcalendar.functions import remove_from_deployment
 from tenantcalendar.functions import remove_from_group
 from tenantcalendar.functions import remove_from_user
-from tenantcalendar.orm import CustomerEvent, UserEvent
+from tenantcalendar.orm import CustomerEvent
+from tenantcalendar.orm import DeploymentCustomerEvent
+from tenantcalendar.orm import GroupCustomerEvent
+from tenantcalendar.orm import UserCustomerEvent
+from tenantcalendar.orm import UserEvent
 
 
 __all__ = [
     'ERRORS',
     'MissingContactInfo',
     'CustomerEvent',
+    'DeploymentCustomerEvent',
+    'GroupCustomerEvent',
+    'UserCustomerEvent',
     'UserEvent',
     'add_to_deployment',
     'add_to_group',
