@@ -4,6 +4,7 @@ from tenantcalendar.errors import ERRORS
 from tenantcalendar.exceptions import MissingContactInfo
 from tenantcalendar.functions import list_customer_events
 from tenantcalendar.functions import get_customer_event
+from tenantcalendar.functions import get_events_for
 from tenantcalendar.functions import list_user_events
 from tenantcalendar.functions import get_user_event
 from tenantcalendar.functions import list_own_events
@@ -18,6 +19,7 @@ __all__ = [
     'UserEvent',
     'list_customer_events',
     'get_customer_event',
+    'get_events_for',
     'list_user_events',
     'get_user_event',
     'list_own_events',
