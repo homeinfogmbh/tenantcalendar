@@ -102,73 +102,123 @@ def get_own_event(ident: int, user: User) -> UserEvent:
     return list_own_events(user).where(UserEvent.id == ident).get()
 
 
-def _get_events_for_groups(groups: Iterable[Group]) -> Select:
+def _get_events_for_groups(
+        groups: Iterable[Group], *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> Select:
     """Select events for the given groups."""
 
-    return CustomerEvent.select().join(GroupCustomerEvent).where(
-        GroupCustomerEvent.group << set(groups)
-    )
+    condition = GroupCustomerEvent.group << set(groups)
+
+    if start is not None:
+        condition &= CustomerEvent.start >= start
+
+    if end is not None:
+        condition &= CustomerEvent.end <= end
+
+    return CustomerEvent.select().join(GroupCustomerEvent).where(condition)
 
 
-def get_events_for_group(group: Group) -> Iterator[CustomerEvent]:
+def get_events_for_group(
+        group: Group, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> Iterator[CustomerEvent]:
     """Yield events for the given group."""
 
     yield from _get_events_for_groups(
-        Groups.for_customer(group.customer).lineage(group)
+        Groups.for_customer(group.customer).lineage(group),
+        start=start,
+        end=end
     )
 
 
-def _get_events_for_user(user: User) -> Select:
+def _get_events_for_user(
+        user: User, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> Select:
     """Select customer events for the given user."""
 
-    return CustomerEvent.select().join(UserCustomerEvent).where(
-        UserCustomerEvent.user == user
-    )
+    condition = UserCustomerEvent.user == user
+
+    if start is not None:
+        condition &= CustomerEvent.start >= start
+
+    if end is not None:
+        condition &= CustomerEvent.end <= end
+
+    return CustomerEvent.select().join(UserCustomerEvent).where(condition)
 
 
-def get_events_for_user(user: User) -> Iterator[CustomerEvent]:
+def get_events_for_user(
+        user: User, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> Iterator[CustomerEvent]:
     """Yields events for the respective user."""
 
-    yield from _get_events_for_user(user)
-    yield from _get_events_for_groups(ggl_user(user))
+    yield from _get_events_for_user(user, start=start, end=end)
+    yield from _get_events_for_groups(ggl_user(user), start=start, end=end)
 
 
-def _get_events_for_deployment(deployment: Deployment) -> Select:
+def _get_events_for_deployment(
+        deployment: Deployment, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
+) -> Select:
     """Select customer events for the given deployment
     and all groups it is contained in.
     """
 
+    condition = DeploymentCustomerEvent.deployment == deployment
+
+    if start is not None:
+        condition &= CustomerEvent.start >= start
+
+    if end is not None:
+        condition &= CustomerEvent.end <= end
+
     return CustomerEvent.select().join(DeploymentCustomerEvent).where(
-        DeploymentCustomerEvent.deployment == deployment
+        condition
     )
 
 
 def get_events_for_deployment(
-        deployment: Deployment
+        deployment: Deployment, *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
 ) -> Iterator[CustomerEvent]:
     """Select customer events for the given deployment
     and all groups it is contained in.
     """
 
-    yield from _get_events_for_deployment(deployment)
-    yield from _get_events_for_groups(ggl_deployment(deployment))
+    yield from _get_events_for_deployment(deployment, start=start, end=end)
+    yield from _get_events_for_groups(
+        ggl_deployment(deployment), start=start, end=end
+    )
 
 
 def get_events_for(
-        target: Union[Group, User, Deployment]
+        target: Union[Group, User, Deployment], *,
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None
 ) -> Iterator[CustomerEvent]:
     """Selects events for the given target."""
 
     if isinstance(target, LocalProxy):
-        return get_events_for(target._get_current_object())
+        return get_events_for(
+            target._get_current_object(), start=start, end=end
+        )
 
     if isinstance(target, Group):
-        return get_events_for_group(target)
+        return get_events_for_group(target, start=start, end=end)
 
     if isinstance(target, User):
-        return get_events_for_user(target)
+        return get_events_for_user(target, start=start, end=end)
 
     if isinstance(target, Deployment):
-        return get_events_for_deployment(target)
+        return get_events_for_deployment(target, start=start, end=end)
 
     raise TypeError(f'Cannot select events for invalid type {type(target)}')
