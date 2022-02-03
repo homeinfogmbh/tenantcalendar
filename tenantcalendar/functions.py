@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import Iterable, Iterator, Optional, Union
 
 from peewee import Select
+from werkzeug.local import LocalProxy
 
 from cmslib import Group, Groups, get_groups_lineage as ggl_user
 from comcatlib import User, get_groups_lineage as ggl_deployment
@@ -157,6 +158,9 @@ def get_events_for(
         target: Union[Group, User, Deployment]
 ) -> Iterator[CustomerEvent]:
     """Selects events for the given target."""
+
+    if isinstance(target, LocalProxy):
+        return get_events_for(target._get_current_object())
 
     if isinstance(target, Group):
         return get_events_for_group(target)

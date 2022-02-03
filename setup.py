@@ -17,6 +17,7 @@ setup(
         'mdb',
         'peewee',
         'peeweeplus',
+        'werkzeug',
         'wsgilib'
     ],
     author='HOMEINFO - Digitale Informationssysteme GmbH',
