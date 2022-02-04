@@ -1,5 +1,6 @@
 """Tenant calendar for ComCat."""
 
+from tenantcalendar.dom import events
 from tenantcalendar.errors import ERRORS
 from tenantcalendar.exceptions import MissingContactInfo
 from tenantcalendar.functions import add_to_deployment

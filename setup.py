@@ -17,6 +17,7 @@ setup(
         'mdb',
         'peewee',
         'peeweeplus',
+        'pyxb',
         'werkzeug',
         'wsgilib'
     ],
