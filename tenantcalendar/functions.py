@@ -60,7 +60,8 @@ def get_customer_event(ident: int, customer: Customer) -> CustomerEvent:
     """Returns the given event of a customer."""
 
     return list_customer_events(customer).where(
-        CustomerEvent.id == ident).get()
+        CustomerEvent.id == ident
+    ).get()
 
 
 def list_user_events(

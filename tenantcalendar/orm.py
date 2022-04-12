@@ -31,15 +31,15 @@ CUSTOMER_FIELDS = {'title', 'start', 'end', 'text'}
 USER_FIELDS = {'title', 'email', 'phone', 'start', 'end', 'text'}
 
 
-class TenantCalendarModel(JSONModel):   # pylint: disable=R0903
+class TenantCalendarModel(JSONModel):
     """Base model for this database."""
 
-    class Meta:     # pylint: disable=C0115,R0903
+    class Meta:
         database = DATABASE
         schema = database.database
 
 
-class Event(TenantCalendarModel):   # pylint: disable=R0903
+class Event(TenantCalendarModel):
     """Common event base."""
 
     title = HTMLCharField(30)
@@ -59,11 +59,12 @@ class Event(TenantCalendarModel):   # pylint: disable=R0903
 class CustomerEvent(Event):
     """A customer-defined event."""
 
-    class Meta:     # pylint: disable=R0903,C0115
+    class Meta:
         table_name = 'customer_event'
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
+        Customer, column_name='customer', on_delete='CASCADE'
+    )
 
     @classmethod
     def from_json(cls, json: dict, customer: Union[Customer, int],
@@ -123,7 +124,7 @@ class DeploymentCustomerEvent(TenantCalendarModel):
 class UserEvent(Event):
     """A user-defined event."""
 
-    class Meta:     # pylint: disable=R0903,C0115
+    class Meta:
         table_name = 'user_event'
 
     user = ForeignKeyField(User, column_name='user', on_delete='CASCADE')
@@ -131,8 +132,12 @@ class UserEvent(Event):
     phone = HTMLCharField(64, null=True)
 
     @classmethod
-    def from_json(cls, json: dict, user: Union[User, int],
-                  **kwargs) -> UserEvent:
+    def from_json(
+            cls,
+            json: dict,
+            user: Union[User, int],
+            **kwargs
+    ) -> UserEvent:
         """Creates an event from a JSON-ish dict."""
         event = super().from_json(json, **kwargs)
         event.user = user
