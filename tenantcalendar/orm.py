@@ -10,7 +10,12 @@ from cmslib import Group
 from comcatlib import User
 from hwdb import Deployment
 from mdb import Customer
-from peeweeplus import HTMLCharField, JSONModel, MySQLDatabaseProxy
+from peeweeplus import EMailField
+from peeweeplus import HTMLCharField
+from peeweeplus import HTMLTextField
+from peeweeplus import JSONModel
+from peeweeplus import MySQLDatabaseProxy
+from peeweeplus import PhoneNumberField
 
 from tenantcalendar.exceptions import MissingContactInfo
 
@@ -42,8 +47,8 @@ class TenantCalendarModel(JSONModel):
 class Event(TenantCalendarModel):
     """Common event base."""
 
-    title = HTMLCharField(30)
-    text = HTMLCharField(640)
+    title = HTMLCharField(255)
+    text = HTMLTextField()
     start = DateTimeField()
     end = DateTimeField()
     created = DateTimeField(default=datetime.now)
@@ -128,8 +133,8 @@ class UserEvent(Event):
         table_name = 'user_event'
 
     user = ForeignKeyField(User, column_name='user', on_delete='CASCADE')
-    email = HTMLCharField(64, null=True)
-    phone = HTMLCharField(64, null=True)
+    email = EMailField(64, null=True)
+    phone = PhoneNumberField(64, null=True)
 
     @classmethod
     def from_json(
