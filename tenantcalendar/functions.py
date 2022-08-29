@@ -245,7 +245,7 @@ def add_to_group(event: CustomerEvent, group: Group) -> GroupCustomerEvent:
         ).where(
             (GroupCustomerEvent.event == event)
             & (GroupCustomerEvent.group == group)
-        )
+        ).get()
     except GroupCustomerEvent.DoesNotExist:
         gce = GroupCustomerEvent(event=event, group=group)
         gce.save()
@@ -263,7 +263,7 @@ def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
         ).where(
             (UserCustomerEvent.event == event)
             & (UserCustomerEvent.user == user)
-        )
+        ).get()
     except UserCustomerEvent.DoesNotExist:
         uce = UserCustomerEvent(event=event, user=user)
         uce.save()
@@ -284,7 +284,7 @@ def add_to_deployment(
         ).where(
             (DeploymentCustomerEvent.event == event)
             & (DeploymentCustomerEvent.deployment == deployment)
-        )
+        ).get()
     except DeploymentCustomerEvent.DoesNotExist:
         dce = DeploymentCustomerEvent(event=event, deployment=deployment)
         dce.save()
