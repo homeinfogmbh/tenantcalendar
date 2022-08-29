@@ -13,6 +13,7 @@ setup(
     install_requires=[
         'cmslib',
         'comcatlib',
+        'firebase_admin',
         'hwdb',
         'mdb',
         'peewee',

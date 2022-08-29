@@ -3,6 +3,7 @@
 from tenantcalendar.dom import events
 from tenantcalendar.errors import ERRORS
 from tenantcalendar.exceptions import MissingContactInfo
+from tenantcalendar.fcm import notify
 from tenantcalendar.functions import add_to_deployment
 from tenantcalendar.functions import add_to_group
 from tenantcalendar.functions import add_to_user
@@ -49,5 +50,6 @@ __all__ = [
     'get_user_event',
     'list_customer_events',
     'list_user_events',
-    'list_own_events'
+    'list_own_events',
+    'notify'
 ]
