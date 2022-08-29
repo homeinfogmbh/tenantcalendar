@@ -238,7 +238,11 @@ def add_to_group(event: CustomerEvent, group: Group) -> GroupCustomerEvent:
     """Add an event to a group."""
 
     try:
-        return GroupCustomerEvent.get(
+        return GroupCustomerEvent.select(
+            GroupCustomerEvent, CustomerEvent
+        ).join(CustomerEvent).join_from(
+            GroupCustomerEvent, Group
+        ).where(
             (GroupCustomerEvent.event == event)
             & (GroupCustomerEvent.group == group)
         )
@@ -252,7 +256,11 @@ def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
     """Add an event to a user."""
 
     try:
-        return UserCustomerEvent.get(
+        return UserCustomerEvent.select(
+            UserCustomerEvent, CustomerEvent
+        ).join(CustomerEvent).join_from(
+            UserCustomerEvent, User
+        ).where(
             (UserCustomerEvent.event == event)
             & (UserCustomerEvent.user == user)
         )
@@ -269,7 +277,11 @@ def add_to_deployment(
     """Add an event to a deployment."""
 
     try:
-        return DeploymentCustomerEvent.get(
+        return DeploymentCustomerEvent.select(
+            DeploymentCustomerEvent, CustomerEvent, Deployment
+        ).join(CustomerEvent).join_from(
+            DeploymentCustomerEvent, Deployment
+        ).where(
             (DeploymentCustomerEvent.event == event)
             & (DeploymentCustomerEvent.deployment == deployment)
         )
