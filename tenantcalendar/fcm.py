@@ -1,5 +1,6 @@
 """Firebase Cloud Messaging API."""
 
+from logging import getLogger
 from typing import Iterator, Union
 
 from firebase_admin.messaging import BatchResponse
@@ -24,6 +25,9 @@ __all__ = ['notify']
 def notify(customer_event: CustomerEvent) -> BatchResponse:
     """Multicast customer event to users."""
 
+    getLogger('teantcalendar').info(
+        'Notifying customer event: %s', customer_event
+    )
     return multicast_message(
         [
             token.token for token in
