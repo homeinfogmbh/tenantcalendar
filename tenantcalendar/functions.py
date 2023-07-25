@@ -19,29 +19,30 @@ from tenantcalendar.orm import UserEvent
 
 
 __all__ = [
-    'list_customer_events',
-    'get_customer_event',
-    'list_user_events',
-    'get_user_event',
-    'list_own_events',
-    'get_own_event',
-    'get_events_for',
-    'add_to_group',
-    'add_to_user',
-    'add_to_deployment',
-    'get_deployment_customer_event',
-    'get_deployment_customer_events',
-    'get_group_customer_event',
-    'get_group_customer_events',
-    'get_user_customer_event',
-    'get_user_customer_events'
+    "list_customer_events",
+    "get_customer_event",
+    "list_user_events",
+    "get_user_event",
+    "list_own_events",
+    "get_own_event",
+    "get_events_for",
+    "add_to_group",
+    "add_to_user",
+    "add_to_deployment",
+    "get_deployment_customer_event",
+    "get_deployment_customer_events",
+    "get_group_customer_event",
+    "get_group_customer_events",
+    "get_user_customer_event",
+    "get_user_customer_events",
 ]
 
 
 def list_customer_events(
-        customer: Customer, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    customer: Customer,
+    *,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
 ) -> Select:
     """Lists user events."""
 
@@ -59,15 +60,14 @@ def list_customer_events(
 def get_customer_event(ident: int, customer: Customer) -> CustomerEvent:
     """Returns the given event of a customer."""
 
-    return list_customer_events(customer).where(
-        CustomerEvent.id == ident
-    ).get()
+    return list_customer_events(customer).where(CustomerEvent.id == ident).get()
 
 
 def list_user_events(
-        customer: Customer, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    customer: Customer,
+    *,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
 ) -> Select:
     """Lists user events."""
 
@@ -89,9 +89,7 @@ def get_user_event(ident: int, customer: Customer) -> UserEvent:
 
 
 def list_own_events(
-        user: User, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    user: User, *, start: Optional[datetime] = None, end: Optional[datetime] = None
 ) -> Select:
     """Lists user events."""
 
@@ -113,20 +111,19 @@ def get_own_event(ident: int, user: User) -> UserEvent:
 
 
 def _get_events_for_groups(
-        groups: Iterable[Group], *,
-        condition: Union[bool, Expression] = True
+    groups: Iterable[Group], *, condition: Union[bool, Expression] = True
 ) -> Select:
     """Select events for the given groups."""
 
-    return CustomerEvent.select().join(GroupCustomerEvent).where(
-        condition & (GroupCustomerEvent.group << set(groups))
+    return (
+        CustomerEvent.select()
+        .join(GroupCustomerEvent)
+        .where(condition & (GroupCustomerEvent.group << set(groups)))
     )
 
 
 def get_events_for_group(
-        group: Group, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    group: Group, *, start: Optional[datetime] = None, end: Optional[datetime] = None
 ) -> Iterator[CustomerEvent]:
     """Yield events for the given group."""
 
@@ -139,26 +136,24 @@ def get_events_for_group(
         condition &= CustomerEvent.end <= end
 
     yield from _get_events_for_groups(
-        Groups.for_customer(group.customer).lineage(group),
-        condition=condition
+        Groups.for_customer(group.customer).lineage(group), condition=condition
     )
 
 
 def _get_events_for_user(
-        user: User, *,
-        condition: Union[bool, Expression] = True
+    user: User, *, condition: Union[bool, Expression] = True
 ) -> Select:
     """Select customer events for the given user."""
 
-    return CustomerEvent.select().join(UserCustomerEvent).where(
-        condition & (UserCustomerEvent.user == user)
+    return (
+        CustomerEvent.select()
+        .join(UserCustomerEvent)
+        .where(condition & (UserCustomerEvent.user == user))
     )
 
 
 def get_events_for_user(
-        user: User, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    user: User, *, start: Optional[datetime] = None, end: Optional[datetime] = None
 ) -> Iterator[CustomerEvent]:
     """Yields events for the respective user."""
 
@@ -175,22 +170,24 @@ def get_events_for_user(
 
 
 def _get_events_for_deployment(
-        deployment: Deployment, *,
-        condition: Union[bool, Expression] = True
+    deployment: Deployment, *, condition: Union[bool, Expression] = True
 ) -> Select:
     """Select customer events for the given deployment
     and all groups it is contained in.
     """
 
-    return CustomerEvent.select().join(DeploymentCustomerEvent).where(
-        condition & (DeploymentCustomerEvent.deployment == deployment)
+    return (
+        CustomerEvent.select()
+        .join(DeploymentCustomerEvent)
+        .where(condition & (DeploymentCustomerEvent.deployment == deployment))
     )
 
 
 def get_events_for_deployment(
-        deployment: Deployment, *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    deployment: Deployment,
+    *,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
 ) -> Iterator[CustomerEvent]:
     """Select customer events for the given deployment
     and all groups it is contained in.
@@ -205,22 +202,19 @@ def get_events_for_deployment(
         condition &= CustomerEvent.end <= end
 
     yield from _get_events_for_deployment(deployment, condition=condition)
-    yield from _get_events_for_groups(
-        ggl_deployment(deployment), condition=condition
-    )
+    yield from _get_events_for_groups(ggl_deployment(deployment), condition=condition)
 
 
 def get_events_for(
-        target: Union[Group, User, Deployment], *,
-        start: Optional[datetime] = None,
-        end: Optional[datetime] = None
+    target: Union[Group, User, Deployment],
+    *,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
 ) -> Iterator[CustomerEvent]:
     """Selects events for the given target."""
 
     if isinstance(target, LocalProxy):
-        return get_events_for(
-            target._get_current_object(), start=start, end=end
-        )
+        return get_events_for(target._get_current_object(), start=start, end=end)
 
     if isinstance(target, Group):
         return get_events_for_group(target, start=start, end=end)
@@ -231,21 +225,23 @@ def get_events_for(
     if isinstance(target, Deployment):
         return get_events_for_deployment(target, start=start, end=end)
 
-    raise TypeError(f'Cannot select events for invalid type {type(target)}')
+    raise TypeError(f"Cannot select events for invalid type {type(target)}")
 
 
 def add_to_group(event: CustomerEvent, group: Group) -> GroupCustomerEvent:
     """Add an event to a group."""
 
     try:
-        return GroupCustomerEvent.select(
-            GroupCustomerEvent, CustomerEvent
-        ).join(CustomerEvent).join_from(
-            GroupCustomerEvent, Group
-        ).where(
-            (GroupCustomerEvent.event == event)
-            & (GroupCustomerEvent.group == group)
-        ).get()
+        return (
+            GroupCustomerEvent.select(GroupCustomerEvent, CustomerEvent)
+            .join(CustomerEvent)
+            .join_from(GroupCustomerEvent, Group)
+            .where(
+                (GroupCustomerEvent.event == event)
+                & (GroupCustomerEvent.group == group)
+            )
+            .get()
+        )
     except GroupCustomerEvent.DoesNotExist:
         gce = GroupCustomerEvent(event=event, group=group)
         gce.save()
@@ -256,14 +252,15 @@ def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
     """Add an event to a user."""
 
     try:
-        return UserCustomerEvent.select(
-            UserCustomerEvent, CustomerEvent
-        ).join(CustomerEvent).join_from(
-            UserCustomerEvent, User
-        ).where(
-            (UserCustomerEvent.event == event)
-            & (UserCustomerEvent.user == user)
-        ).get()
+        return (
+            UserCustomerEvent.select(UserCustomerEvent, CustomerEvent)
+            .join(CustomerEvent)
+            .join_from(UserCustomerEvent, User)
+            .where(
+                (UserCustomerEvent.event == event) & (UserCustomerEvent.user == user)
+            )
+            .get()
+        )
     except UserCustomerEvent.DoesNotExist:
         uce = UserCustomerEvent(event=event, user=user)
         uce.save()
@@ -271,20 +268,23 @@ def add_to_user(event: CustomerEvent, user: User) -> UserCustomerEvent:
 
 
 def add_to_deployment(
-        event: CustomerEvent,
-        deployment: Deployment
+    event: CustomerEvent, deployment: Deployment
 ) -> DeploymentCustomerEvent:
     """Add an event to a deployment."""
 
     try:
-        return DeploymentCustomerEvent.select(
-            DeploymentCustomerEvent, CustomerEvent, Deployment
-        ).join(CustomerEvent).join_from(
-            DeploymentCustomerEvent, Deployment
-        ).where(
-            (DeploymentCustomerEvent.event == event)
-            & (DeploymentCustomerEvent.deployment == deployment)
-        ).get()
+        return (
+            DeploymentCustomerEvent.select(
+                DeploymentCustomerEvent, CustomerEvent, Deployment
+            )
+            .join(CustomerEvent)
+            .join_from(DeploymentCustomerEvent, Deployment)
+            .where(
+                (DeploymentCustomerEvent.event == event)
+                & (DeploymentCustomerEvent.deployment == deployment)
+            )
+            .get()
+        )
     except DeploymentCustomerEvent.DoesNotExist:
         dce = DeploymentCustomerEvent(event=event, deployment=deployment)
         dce.save()
@@ -292,57 +292,57 @@ def add_to_deployment(
 
 
 def get_deployment_customer_event(
-        ident: int,
-        customer: Union[Customer, int]
+    ident: int, customer: Union[Customer, int]
 ) -> DeploymentCustomerEvent:
     """Select deployment customer event mappings."""
 
-    return get_deployment_customer_events(customer).where(
-        DeploymentCustomerEvent.id == ident
-    ).get()
+    return (
+        get_deployment_customer_events(customer)
+        .where(DeploymentCustomerEvent.id == ident)
+        .get()
+    )
 
 
 def get_deployment_customer_events(customer: Union[Customer, int]) -> Select:
     """Select deployment customer event mappings."""
 
-    return DeploymentCustomerEvent.select().join(Deployment).where(
-        Deployment.customer == customer
+    return (
+        DeploymentCustomerEvent.select()
+        .join(Deployment)
+        .where(Deployment.customer == customer)
     )
 
 
 def get_group_customer_event(
-        ident: int,
-        customer: Union[Customer, int]
+    ident: int, customer: Union[Customer, int]
 ) -> GroupCustomerEvent:
     """Select group customer event mappings."""
 
-    return get_group_customer_events(customer).where(
-        GroupCustomerEvent.id == ident
-    ).get()
+    return (
+        get_group_customer_events(customer).where(GroupCustomerEvent.id == ident).get()
+    )
 
 
 def get_group_customer_events(customer: Union[Customer, int]) -> Select:
     """Select group customer event mappings."""
 
-    return GroupCustomerEvent.select().join(Group).where(
-        Group.customer == customer
-    )
+    return GroupCustomerEvent.select().join(Group).where(Group.customer == customer)
 
 
 def get_user_customer_event(
-        ident: int,
-        customer: Union[Customer, int]
+    ident: int, customer: Union[Customer, int]
 ) -> UserCustomerEvent:
     """Select user customer event mappings."""
 
-    return get_user_customer_events(customer).where(
-        UserCustomerEvent.id == ident
-    ).get()
+    return get_user_customer_events(customer).where(UserCustomerEvent.id == ident).get()
 
 
 def get_user_customer_events(customer: Union[Customer, int]) -> Select:
     """Select user customer event mappings."""
 
-    return UserCustomerEvent.select().join(User).join(Tenement).where(
-        Tenement.customer == customer
+    return (
+        UserCustomerEvent.select()
+        .join(User)
+        .join(Tenement)
+        .where(Tenement.customer == customer)
     )

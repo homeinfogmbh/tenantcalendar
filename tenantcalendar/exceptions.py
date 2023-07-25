@@ -1,7 +1,7 @@
 """Common exceptions."""
 
 
-__all__ = ['MissingContactInfo']
+__all__ = ["MissingContactInfo"]
 
 
 class MissingContactInfo(Exception):

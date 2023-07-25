@@ -21,19 +21,19 @@ from tenantcalendar.exceptions import MissingContactInfo
 
 
 __all__ = [
-    'CUSTOMER_FIELDS',
-    'USER_FIELDS',
-    'CustomerEvent',
-    'DeploymentCustomerEvent',
-    'GroupCustomerEvent',
-    'UserCustomerEvent',
-    'UserEvent'
+    "CUSTOMER_FIELDS",
+    "USER_FIELDS",
+    "CustomerEvent",
+    "DeploymentCustomerEvent",
+    "GroupCustomerEvent",
+    "UserCustomerEvent",
+    "UserEvent",
 ]
 
 
-DATABASE = MySQLDatabaseProxy('tenantcalendar')
-CUSTOMER_FIELDS = {'title', 'start', 'end', 'text'}
-USER_FIELDS = {'title', 'email', 'phone', 'start', 'end', 'text'}
+DATABASE = MySQLDatabaseProxy("tenantcalendar")
+CUSTOMER_FIELDS = {"title", "start", "end", "text"}
+USER_FIELDS = {"title", "email", "phone", "start", "end", "text"}
 
 
 class TenantCalendarModel(JSONModel):
@@ -65,15 +65,14 @@ class CustomerEvent(Event):
     """A customer-defined event."""
 
     class Meta:
-        table_name = 'customer_event'
+        table_name = "customer_event"
 
-    customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE'
-    )
+    customer = ForeignKeyField(Customer, column_name="customer", on_delete="CASCADE")
 
     @classmethod
-    def from_json(cls, json: dict, customer: Union[Customer, int],
-                  **kwargs) -> CustomerEvent:
+    def from_json(
+        cls, json: dict, customer: Union[Customer, int], **kwargs
+    ) -> CustomerEvent:
         """Creates an event from a JSON-ish dict."""
         event = super().from_json(json, **kwargs)
         event.customer = customer
@@ -84,14 +83,13 @@ class GroupCustomerEvent(TenantCalendarModel):
     """Mapping table for groups and customer events."""
 
     class Meta:
-        table_name = 'group_customer_event'
+        table_name = "group_customer_event"
 
     group = ForeignKeyField(
-        Group, column_name='group', backref='events', on_delete='CASCADE'
+        Group, column_name="group", backref="events", on_delete="CASCADE"
     )
     event = ForeignKeyField(
-        CustomerEvent, column_name='event', backref='groups',
-        on_delete='CASCADE'
+        CustomerEvent, column_name="event", backref="groups", on_delete="CASCADE"
     )
 
 
@@ -99,14 +97,13 @@ class UserCustomerEvent(TenantCalendarModel):
     """Mapping table for groups and customer events."""
 
     class Meta:
-        table_name = 'user_customer_event'
+        table_name = "user_customer_event"
 
     user = ForeignKeyField(
-        User, column_name='user', backref='events', on_delete='CASCADE'
+        User, column_name="user", backref="events", on_delete="CASCADE"
     )
     event = ForeignKeyField(
-        CustomerEvent, column_name='event', backref='groups',
-        on_delete='CASCADE'
+        CustomerEvent, column_name="event", backref="groups", on_delete="CASCADE"
     )
 
 
@@ -114,15 +111,13 @@ class DeploymentCustomerEvent(TenantCalendarModel):
     """Mapping table for deployments and customer events."""
 
     class Meta:
-        table_name = 'deployment_customer_event'
+        table_name = "deployment_customer_event"
 
     deployment = ForeignKeyField(
-        Deployment, column_name='deployment', backref='events',
-        on_delete='CASCADE'
+        Deployment, column_name="deployment", backref="events", on_delete="CASCADE"
     )
     event = ForeignKeyField(
-        CustomerEvent, column_name='event', backref='groups',
-        on_delete='CASCADE'
+        CustomerEvent, column_name="event", backref="groups", on_delete="CASCADE"
     )
 
 
@@ -130,19 +125,14 @@ class UserEvent(Event):
     """A user-defined event."""
 
     class Meta:
-        table_name = 'user_event'
+        table_name = "user_event"
 
-    user = ForeignKeyField(User, column_name='user', on_delete='CASCADE')
+    user = ForeignKeyField(User, column_name="user", on_delete="CASCADE")
     email = EMailField(64, null=True)
     phone = PhoneNumberField(64, null=True)
 
     @classmethod
-    def from_json(
-            cls,
-            json: dict,
-            user: Union[User, int],
-            **kwargs
-    ) -> UserEvent:
+    def from_json(cls, json: dict, user: Union[User, int], **kwargs) -> UserEvent:
         """Creates an event from a JSON-ish dict."""
         event = super().from_json(json, **kwargs)
         event.user = user
@@ -153,4 +143,4 @@ class UserEvent(Event):
         if self.email or self.phone:
             return super().save(*args, **kwargs)
 
-        raise MissingContactInfo('Must specify either email or phone.')
+        raise MissingContactInfo("Must specify either email or phone.")
